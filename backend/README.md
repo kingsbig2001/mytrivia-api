@@ -32,6 +32,7 @@ This will install all of the required packages we selected within the `requireme
 
 ## Database Setup
 With the project dependencies installed, create a db for the project using command `dropdb trivia` and `createdb trivia` in the terminal. Update the [`config.py`](./config.py) file . Then run a flask db upgrade in the terminal to setup the tables and constraints
+With the project dependencies installed, create a db for the project using command `dropdb trivia` and `createdb trivia` in the terminal. Update the [`./config/`](./config.py) file . Then run a flask db upgrade in the terminal to setup the tables and constraints
 ```bash
 flask db upgrade
 ```
