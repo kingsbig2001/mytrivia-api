@@ -8,12 +8,14 @@ DEBUG = True
 
 # Connect to the database
 # Complete this section before running flask db upgrade
-database_name = "trivia"
+database_name = ""
 pg_user = ""
 pg_pass = ""
-database_path = "postgres://{}:{}@{}/{}".format(pg_user, pg_pass,'localhost:5432', database_name)
+database_path = "postgresql://{}:{}@{}/{}".format(pg_user, pg_pass,'localhost:5432', database_name)
 
 
+# self.database_name = "trivia_test"
+# self.database_path = "postgres://{}:{}@{}/{}".format('postgres','chines2001','localhost:5432', self.database_name)
 # TODO IMPLEMENT DATABASE URL
 SQLALCHEMY_DATABASE_URI = database_path
 SQLALCHEMY_TRACK_MODIFICATIONS = False

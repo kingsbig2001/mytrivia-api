@@ -120,7 +120,7 @@ def create_app(test_config=None):
 
       return jsonify({
         "success" : True,
-        "id" : question.id,
+        "deleted" : question.id,
         "questions" : current_questions,
         "total_questions" : len(selection),
         "categories": categories_ids,
@@ -229,17 +229,23 @@ def create_app(test_config=None):
   '''
   @app.route('/categories/<int:id>/questions')
   def retrieve_questions_categories(id):
-    #fetch list of questions in a specified category(id)
-    # and paginate the result
-    selection = Question.query.filter(Question.category == id).order_by(Question.id).all()
-    questions = paginate_questions(request, selection)
+    '''fetch list of questions in a specified category(id)
+    and paginate the result'''
 
-    return jsonify({
-      "success" : True,
-      "questions": questions,
-      "total_questions" : len(selection),
-      "current_category": id
-    })
+    #check if category available 
+    category = Category.query.filter(Category.id == id).one_or_none()
+    if category is None:
+      abort(404)
+    else:
+      selection = Question.query.filter(Question.category == id).order_by(Question.id).all()
+      questions = paginate_questions(request, selection)
+
+      return jsonify({
+        "success" : True,
+        "questions": questions,
+        "total_questions" : len(selection),
+        "current_category": id
+      })
 
 
   '''
