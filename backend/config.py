@@ -8,7 +8,7 @@ DEBUG = True
 
 # Connect to the database
 # Complete this section before running flask db upgrade
-database_name = ""
+database_name = "trivia"
 pg_user = ""
 pg_pass = ""
 database_path = "postgresql://{}:{}@{}/{}".format(pg_user, pg_pass,'localhost:5432', database_name)

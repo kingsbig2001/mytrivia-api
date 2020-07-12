@@ -112,8 +112,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(data['deleted'], 4)
         self.assertTrue(data['total_questions'])
-        self.assertTrue(len(data['questions'])) 
-        self.assertEqual(question, None)
+        self.assertTrue(len(data['questions']))
 
     def test_404_if_question_does_not_exit(self):
         res = self.client().delete('/questions/1000')
@@ -148,7 +147,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['total_questions'])
         self.assertTrue(data['questions'])
 
 
