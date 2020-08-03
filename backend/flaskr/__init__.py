@@ -66,7 +66,7 @@ def create_app(test_config=None):
         categories = Category.query.order_by(Category.id).all()
         if not categories:
             abort(404)
-        
+
         categories_formatted = {}
         for category in categories:
             categories_formatted[category.id] = category.type
@@ -98,21 +98,12 @@ def create_app(test_config=None):
         try:
             if not categories:
                 abort(404)
-        
+
             for category in categories:
                 categories_formatted[category.id] = category.type
-        
-            for id in list(categories_formatted):
-                selection = Question.query\
-                    .filter(Question.category == id).all()
-                if selection:
-                    current_category = id
-                    break
 
             # Paginate questions
-            selection = Question.query\
-                .filter(Question.category == current_category)\
-                .order_by(Question.id).all()
+            selection = Question.query.order_by(Question.id).all()
             current_questions = paginate_questions(request, selection)
 
             # resource not found
@@ -128,8 +119,6 @@ def create_app(test_config=None):
                 })
         except:
             abort(404)
-            
-        
 
     '''
     @DONE:
@@ -224,9 +213,8 @@ def create_app(test_config=None):
             new_category = body.get('category')
             new_difficulty = body.get('difficulty')
 
-            if not\
-                (new_question and new_answer and\
-                    new_category and new_difficulty):
+            if not(new_question and new_answer and
+               new_category and new_difficulty):
                 abort(400)
 
             # lookup db to ensure no duplicate question
@@ -326,12 +314,12 @@ def create_app(test_config=None):
 
         previous_questions = body.get('previous_questions')
         quiz_category = body.get('quiz_category')
-        
+
         try:
             # check if previous_questoins is available
             if previous_questions is None:
                 abort(404)
-            
+
             # Select all questions in the database
             if quiz_category['id'] == 0:
                 questions = Question.query\
@@ -345,8 +333,10 @@ def create_app(test_config=None):
 
             # Check for questions in selected category
             if not questions:
-                abort(404)
-            
+                return jsonify({
+                    "success": True
+                })
+
             # randomize the questions
             random.shuffle(questions)
 
@@ -355,7 +345,7 @@ def create_app(test_config=None):
 
             # update the list of previous questions
             previous_questions.append(current_question['id'])
-            
+
             return jsonify({
                     "success": True,
                     "question": current_question,

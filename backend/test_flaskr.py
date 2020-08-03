@@ -25,8 +25,8 @@ class TriviaTestCase(unittest.TestCase):
             self.db.create_all()
 
         self.new_question = {
-            "question": "What is your other name",
-            "answer": "Chinedu",
+            "question": "FAC champion",
+            "answer": "Arsenal",
             "category": 2,
             "difficulty": 3
             }
@@ -60,7 +60,7 @@ class TriviaTestCase(unittest.TestCase):
             }
 
         self.new_searchterm = {
-            "searchTerm": "Water"
+            "searchTerm": "The"
             }
 
         self.random_quizzes={
@@ -136,12 +136,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'method not allowed')
     
     def test_delete_question(self):
-        res = self.client().delete('/questions/14')
+        res = self.client().delete('/questions/34')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 14)
+        self.assertEqual(data['deleted'], 34)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
 
@@ -209,7 +209,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['questions'])
+        self.assertEqual(type(data['questions']), list)
 
     def test_405_wrong_methods_on_questions(self):
         res = self.client().patch('/questions/1')
