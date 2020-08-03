@@ -64,6 +64,9 @@ def create_app(test_config=None):
     def get_categories():
         """Get all categories formatted as {1: 'Science', 2: 'Geography'}"""
         categories = Category.query.order_by(Category.id).all()
+        if not categories:
+            abort(404)
+        
         categories_formatted = {}
         for category in categories:
             categories_formatted[category.id] = category.type
@@ -91,26 +94,42 @@ def create_app(test_config=None):
         """Get all categories formatted as {1: 'Science', 2: 'Geography'}"""
         categories = Category.query.order_by(Category.id).all()
         categories_formatted = {}
+        current_category = None
+        try:
+            if not categories:
+                abort(404)
+        
+            for category in categories:
+                categories_formatted[category.id] = category.type
+        
+            for id in list(categories_formatted):
+                selection = Question.query\
+                    .filter(Question.category == id).all()
+                if selection:
+                    current_category = id
+                    break
 
-        for category in categories:
-            categories_formatted[category.id] = category.type
+            # Paginate questions
+            selection = Question.query\
+                .filter(Question.category == current_category)\
+                .order_by(Question.id).all()
+            current_questions = paginate_questions(request, selection)
 
-        # Get list of categories ids
-        current_category = list(categories_formatted)[0]
+            # resource not found
+            if not current_questions:
+                abort(404)
 
-        # Paginate questions
-        selection = Question.query\
-            .filter(Question.category == current_category)\
-            .order_by(Question.id).all()
-        current_questions = paginate_questions(request, selection)
-
-        return jsonify({
-                "success": True,
-                "questions": current_questions,
-                "total_questions": len(selection),
-                "categories": categories_formatted,
-                "current_category": current_category
-            })
+            return jsonify({
+                    "success": True,
+                    "questions": current_questions,
+                    "total_questions": len(selection),
+                    "categories": categories_formatted,
+                    "current_category": current_category
+                })
+        except:
+            abort(404)
+            
+        
 
     '''
     @DONE:
@@ -204,6 +223,11 @@ def create_app(test_config=None):
             new_answer = body.get('answer')
             new_category = body.get('category')
             new_difficulty = body.get('difficulty')
+
+            if not\
+                (new_question and new_answer and\
+                    new_category and new_difficulty):
+                abort(400)
 
             # lookup db to ensure no duplicate question
             check_question = Question.query\
@@ -302,32 +326,43 @@ def create_app(test_config=None):
 
         previous_questions = body.get('previous_questions')
         quiz_category = body.get('quiz_category')
+        
+        try:
+            # check if previous_questoins is available
+            if previous_questions is None:
+                abort(404)
+            
+            # Select all questions in the database
+            if quiz_category['id'] == 0:
+                questions = Question.query\
+                    .filter(~Question.id.in_(previous_questions)).all()
 
-        # Select all questions in the database
-        if quiz_category['id'] == 0:
-            questions = Question.query\
-                .filter(~Question.id.in_(previous_questions)).all()
+            # Select questions within a specified category(quiz_category)
+            else:
+                questions = Question.query\
+                    .filter(Question.category == quiz_category['id'])\
+                    .filter(~Question.id.in_(previous_questions)).all()
 
-        # Select questions within a specified category(quiz_category)
-        else:
-            questions = Question.query\
-                .filter(Question.category == quiz_category['id'])\
-                .filter(~Question.id.in_(previous_questions)).all()
+            # Check for questions in selected category
+            if not questions:
+                abort(404)
+            
+            # randomize the questions
+            random.shuffle(questions)
 
-        # randomize the questions
-        random.shuffle(questions)
+            # return first question of the reshuffled list of questions
+            current_question = questions[0].format()
 
-        # return first question of the reshuffled list of questions
-        current_question = questions[0].format()
-
-        # update the list of previous questions
-        previous_questions.append(current_question['id'])
-
-        return jsonify({
-                "success": True,
-                "question": current_question,
-                "previous_questions": previous_questions
-            })
+            # update the list of previous questions
+            previous_questions.append(current_question['id'])
+            
+            return jsonify({
+                    "success": True,
+                    "question": current_question,
+                    "previous_questions": previous_questions
+                })
+        except:
+            abort(404)
 
     # Error Handling
     '''
